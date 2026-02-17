@@ -60,6 +60,13 @@
 			letter-spacing: 0.1em;
 		}
 
+		.transliteration {
+			font-size: 1.5rem;
+			color: #666;
+			margin-top: 12px;
+			direction: rtl;
+		}
+
 		/* Choice Area - 2x3 Grid */
 		.choice-area {
 			display: grid;
@@ -176,6 +183,10 @@
 				letter-spacing: 0.08em;
 			}
 
+			.transliteration {
+				font-size: 1.2rem;
+			}
+
 			.choice-btn {
 				font-size: 1.4rem;
 				padding: 20px 10px;
@@ -197,6 +208,7 @@
 	<!-- Main Area: English Word -->
 	<div class="main-area">
 		<h2 id="english-word">Loading...</h2>
+		<p id="transliteration" class="transliteration"></p>
 	</div>
 
 	<!-- Choice Area: 2x3 Grid of Hebrew Buttons -->
@@ -207,80 +219,80 @@
 	<script>
 		// ========== DATA: English-Hebrew word pairs ==========
 		const WORDS = `
-Dog	כֶּלֶב
-friend	חָבֵר
-new	חָדָשׁ
-one	1
-two	2
-three	3
-hello	שָׁלוֹם
-Apple	תַּפּוּחַ
-Cake	עוּגָה
-food	אוֹכֶל
-four	4
-Ice cream	גְּלִידָה
-Milk	חָלָב
-sandwich	סֶנְדְוִויץ'
-Pizza	פִּיצָה
-goodbye	לְהִתְרָאוֹת
-ball	כַּדּוּר
-Blue	כָּחוֹל
-Green	יָרוֹק
-Red	אָדוֹם
-White	לָבָן
-Yellow	צָהוֹב
-baby	תִּינוֹק
-brother	אָח
-dad	אַבָּא
-family	מִשְׁפָּחָה
-mom	אִמָּא
-sister	אָחוֹת
-bed	מִיטָה
-chair	כִּסֵּא
-clock	שָׁעוֹן
-five	5
-house	בַּיִת
-table	שֻׁלְחָן
-boy	ילד
-girl	ילדה
-kid	ילד
-learn	ללמוד
-school	בית ספר
-teacher	מורה
-bag	תיק
-big	גדול
-book	ספר
-computer	מחשב
-pen	עט
-desk	שולחן כתיבה
-English	אנגלית
-Math	חשבון
-six	6
-seven	7
-eight	8
-nine	9
-ten	10
-best	הכי טוב
-eat	לאכול
-fun	כיף
-play	לשחק
-sing	לשיר
-talk	לדבר
-Sunday	יום ראשון
-Monday	יום שני
-Tuesday	יום שלישי
-Wednesday	יום רביעי
-Thursday	יום חמישי
-Friday	יום שישי
-Saturday	שבת
-Happy birthday	יום הולדת שמח
+Dog	דּוֹג	כֶּלֶב
+Friend	פְרֶנְד	חָבֵר
+New	נְיוּ	חָדָשׁ
+One	וַואן	1
+Two	טוּ	2
+Three	תְ'רִי	3
+Hello	הֶלוֹ	שָׁלוֹם
+Apple	אֶפֶּל	תַּפּוּחַ
+Cake	קֵייק	עוּגָה
+Food	פוּד	אוֹכֶל
+Four	פוֹר	4
+Ice cream	אָיְיס קְרִים	גְּלִידָה
+Milk	מִילְק	חָלָב
+Sandwich	סֶנְדְוִויץ'	סֶנְדְוִויץ'
+Pizza	פִּיצָה	פִּיצָה
+Goodbye	גוּדְבַּאי	לְהִתְרָאוֹת
+Ball	בּוֹל	כַּדּוּר
+Blue	בְּלוּ	כָּחוֹל
+Green	גְרִין	יָרוֹק
+Red	רֶד	אָדוֹם
+White	וַואיְט	לָבָן
+Yellow	יֶלוֹ	צָהוֹב
+Baby	בֵּייבִּי	תִּינוֹק
+Brother	בְּרַאדֶ'ר	אָח
+Dad	דֶאד	אַבָּא
+Family	פֶמִילִי	מִשְׁפָּחָה
+Mom	מַאם	אִמָּא
+Sister	סִיסְטֶר	אָחוֹת
+Bed	בֶּד	מִיטָה
+Chair	צֶ'ר	כִּסֵּא
+Clock	קְלוֹק	שָׁעוֹן
+Five	פַאיְב	5
+House	הַאוּס	בַּיִת
+Table	טֵייבֶּל	שֻׁלְחָן
+Boy	בּוֹי	ילד
+Girl	גֶרְל	ילדה
+Kid	קִיד	ילד
+Learn	לֶרְן	ללמוד
+School	סְקוּל	בית ספר
+Teacher	טִיצֶ'ר	מורה
+Bag	בֶּג	תיק
+Big	בִּיג	גדול
+Book	בּוּק	ספר
+Computer	קַמְפְּיוּטֶר	מחשב
+Pen	פֶּן	עט
+Desk	דֶסְק	שולחן כתיבה
+English	אִינְגְלִישׁ	אנגלית
+Math	מֶת'	חשבון
+Six	סִיקְס	6
+Seven	סֶבֶן	7
+Eight	אֵייט	8
+Nine	נַאיְן	9
+Ten	טֶן	10
+Best	בֶּסְט	הכי טוב
+Eat	אִיט	לאכול
+Fun	פַאן	כיף
+Play	פְּלֵיי	לשחק
+Sing	סִינְג	לשיר
+Talk	טוֹק	לדבר
+Sunday	סַנְדֵי	יום ראשון
+Monday	מַנְדֵי	יום שני
+Tuesday	טְיוּזְדֵי	יום שלישי
+Wednesday	וֶנְזְדֵי	יום רביעי
+Thursday	תְ'רְזְדֵי	יום חמישי
+Friday	פְרַאיְדֵי	יום שישי
+Saturday	סַאטֶרְדֵי	שבת
+Happy birthday	הֶפִּי בֶּרְת'דֵי	יום הולדת שמח
 `;
 		const wordPairs = WORDS
 			.trim()
 			.split('\n')
 			.map(line => line.split('\t').map(s => s.trim()))
-			.filter(([e, h]) => e && h)
-			.map(([english, hebrew]) => ({ english: english.toUpperCase(), hebrew }));
+			.filter(parts => parts[0] && parts[2])
+			.map(([english, transliteration, hebrew]) => ({ english: english.toUpperCase(), transliteration, hebrew }));
 
 		// ========== STATE ==========
 		let score = 0;
@@ -288,10 +300,12 @@ Happy birthday	יום הולדת שמח
 		let correctHebrew = null;
 		let awaitingNextRound = false;
 		let suggestionsRevealed = false;
+		let transliterationRevealed = false;
 
 		// ========== DOM ELEMENTS ==========
 		const scoreEl = document.querySelector('.score');
 		const englishWordEl = document.getElementById('english-word');
+		const transliterationEl = document.getElementById('transliteration');
 		const mainAreaEl = document.querySelector('.main-area');
 		const choiceAreaEl = document.getElementById('choice-area');
 
@@ -315,14 +329,16 @@ Happy birthday	יום הולדת שמח
 		function loadNewRound() {
 			awaitingNextRound = false;
 			suggestionsRevealed = false;
+			transliterationRevealed = false;
 			mainAreaEl.classList.add('clickable');
 
 			// Pick random word
 			currentWord = wordPairs[Math.floor(Math.random() * wordPairs.length)];
 			correctHebrew = currentWord.hebrew;
 
-			// Display English word
+			// Display English word only (transliteration shown on click after suggestions)
 			englishWordEl.textContent = currentWord.english;
+			transliterationEl.textContent = '';
 
 			// Generate 5 incorrect + 1 correct, shuffle
 			const wrongAnswers = getRandomWords(5, correctHebrew);
@@ -347,7 +363,7 @@ Happy birthday	יום הולדת שמח
 			const chosen = btn.dataset.hebrew;
 
 			if (chosen === correctHebrew) {
-				score++;
+				score += transliterationRevealed ? 1 : 2;
 				scoreEl.textContent = score;
 				btn.classList.add('correct');
 				setTimeout(loadNewRound, 1500);
@@ -375,7 +391,10 @@ Happy birthday	יום הולדת שמח
 			if (!suggestionsRevealed) {
 				suggestionsRevealed = true;
 				choiceAreaEl.classList.remove('hidden');
-				mainAreaEl.classList.remove('clickable');
+				// Keep clickable so user can click again to reveal transliteration
+			} else if (!transliterationRevealed) {
+				transliterationRevealed = true;
+				transliterationEl.textContent = currentWord.transliteration;
 			}
 		});
 
