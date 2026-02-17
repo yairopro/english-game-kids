@@ -96,6 +96,11 @@
 			animation: greenFlash 0.6s ease;
 		}
 
+		.choice-btn.correct-show {
+			background: #4ade80 !important;
+			box-shadow: 0 0 20px rgba(74, 222, 128, 0.6);
+		}
+
 		.choice-btn.incorrect {
 			animation: redShake 0.6s ease;
 		}
@@ -287,7 +292,7 @@ Happy birthday	יום הולדת שמח
 			.split('\n')
 			.map(line => line.split('\t').map(s => s.trim()))
 			.filter(([e, h]) => e && h)
-			.map(([english, hebrew]) => ({ english, hebrew }));
+			.map(([english, hebrew]) => ({ english: english.toUpperCase(), hebrew }));
 
 		// ========== STATE ==========
 		let score = 0;
@@ -354,14 +359,17 @@ Happy birthday	יום הולדת שמח
 				btn.classList.add('correct');
 				feedbackEl.textContent = 'Correct!';
 				feedbackEl.classList.add('correct');
-				setTimeout(loadNewRound, 800);
+				setTimeout(loadNewRound, 1500);
 			} else {
 				score = Math.max(0, score - 1);
 				scoreEl.textContent = `$${score}$`;
 				btn.classList.add('incorrect');
 				feedbackEl.textContent = 'Try Again!';
 				feedbackEl.classList.add('incorrect');
-				setTimeout(loadNewRound, 800);
+				// Highlight the correct answer in green
+				const correctBtn = choiceAreaEl.querySelector(`[data-hebrew="${correctHebrew}"]`);
+				if (correctBtn) correctBtn.classList.add('correct-show');
+				setTimeout(loadNewRound, 2500);
 			}
 		}
 
