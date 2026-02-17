@@ -148,23 +148,21 @@
 			}
 		}
 
-		.next-round-btn {
-			font-size: 1.5rem;
-			padding: 18px 40px;
-			border: none;
-			border-radius: 16px;
-			background: #fff;
-			color: #333;
-			cursor: pointer;
-			box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+		.main-area {
 			transition: transform 0.2s, box-shadow 0.2s;
-			font-weight: 600;
-			margin-top: 20px;
 		}
 
-		.next-round-btn:hover {
-			transform: scale(1.03);
-			box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+		.main-area.clickable {
+			cursor: pointer;
+		}
+
+		.main-area.clickable:hover {
+			transform: scale(1.02);
+			box-shadow: 0 12px 50px rgba(0, 0, 0, 0.25);
+		}
+
+		.main-area.clickable:active {
+			transform: scale(0.98);
 		}
 
 		/* Responsive */
@@ -201,9 +199,6 @@
 	<div class="choice-area" id="choice-area">
 		<!-- Buttons populated by JS -->
 	</div>
-
-	<!-- Next Round Button (shown after wrong guess) -->
-	<button class="next-round-btn" id="next-round-btn" style="display: none;">Next round</button>
 
 	<script>
 		// ========== DATA: English-Hebrew word pairs ==========
@@ -292,8 +287,8 @@ Happy birthday	יום הולדת שמח
 		// ========== DOM ELEMENTS ==========
 		const scoreEl = document.querySelector('.score');
 		const englishWordEl = document.getElementById('english-word');
+		const mainAreaEl = document.querySelector('.main-area');
 		const choiceAreaEl = document.getElementById('choice-area');
-		const nextRoundBtn = document.getElementById('next-round-btn');
 
 		// ========== HELPERS ==========
 		function shuffleArray(arr) {
@@ -314,7 +309,7 @@ Happy birthday	יום הולדת שמח
 		// ========== GAME LOOP ==========
 		function loadNewRound() {
 			awaitingNextRound = false;
-			nextRoundBtn.style.display = 'none';
+			mainAreaEl.classList.remove('clickable');
 
 			// Pick random word
 			currentWord = wordPairs[Math.floor(Math.random() * wordPairs.length)];
@@ -361,11 +356,13 @@ Happy birthday	יום הולדת שמח
 					if (b.dataset.hebrew !== correctHebrew) b.classList.add('hidden');
 				});
 				awaitingNextRound = true;
-				nextRoundBtn.style.display = 'block';
+				mainAreaEl.classList.add('clickable');
 			}
 		}
 
-		nextRoundBtn.addEventListener('click', loadNewRound);
+		mainAreaEl.addEventListener('click', () => {
+			if (awaitingNextRound) loadNewRound();
+		});
 
 		// ========== INIT ==========
 		loadNewRound();
