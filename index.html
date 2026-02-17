@@ -352,6 +352,7 @@ Happy birthday	הֶפִּי בֶּרְת'דֵי	יום הולדת שמח
 		let currentWord = null;
 		let correctHebrew = null;
 		let awaitingNextRound = false;
+		let awaitingAfterCorrect = false;
 		let suggestionsRevealed = false;
 		let transliterationRevealed = false;
 
@@ -405,6 +406,7 @@ Happy birthday	הֶפִּי בֶּרְת'דֵי	יום הולדת שמח
 		// ========== GAME LOOP ==========
 		function loadNewRound() {
 			awaitingNextRound = false;
+			awaitingAfterCorrect = false;
 			suggestionsRevealed = false;
 			transliterationRevealed = false;
 			mainAreaEl.classList.add('clickable');
@@ -442,7 +444,9 @@ Happy birthday	הֶפִּי בֶּרְת'דֵי	יום הולדת שמח
 			if (chosen === correctHebrew) {
 				score += transliterationRevealed ? 1 : 2;
 				scoreEl.textContent = score;
-				btn.classList.add('correct');
+				btn.classList.add('correct', 'correct-show');
+				awaitingNextRound = true;
+				awaitingAfterCorrect = true;
 				setTimeout(loadNewRound, 1500);
 			} else {
 				score = Math.max(0, score - 1);
@@ -464,6 +468,7 @@ Happy birthday	הֶפִּי בֶּרְת'דֵי	יום הולדת שמח
 
 		mainAreaEl.addEventListener('click', () => {
 			if (awaitingNextRound) {
+				if (awaitingAfterCorrect) return;
 				loadNewRound();
 				return;
 			}
