@@ -24,13 +24,49 @@
 			align-items: center;
 		}
 
-		/* Top Bar - Score */
+		/* Top Bar - Credits (left) + Score (right) */
 		.top-bar {
 			width: 100%;
 			max-width: 600px;
 			display: flex;
-			justify-content: flex-end;
+			justify-content: space-between;
+			align-items: center;
 			padding: 15px 0;
+		}
+
+		.credits-wrap {
+			position: relative;
+			width: 56px;
+			height: 56px;
+		}
+
+		.credits-progress {
+			position: absolute;
+			inset: 0;
+			border-radius: 50%;
+			background: conic-gradient(
+				#4ade80 0deg,
+				#4ade80 calc(var(--progress, 0) * 360deg),
+				rgba(255, 255, 255, 0.3) calc(var(--progress, 0) * 360deg)
+			);
+			transition: background 0.3s ease;
+		}
+
+		.credits-inner {
+			position: absolute;
+			inset: 4px;
+			border-radius: 50%;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+		}
+
+		.credits-count {
+			font-size: 1.4rem;
+			font-weight: bold;
+			color: #fff;
 		}
 
 		.score {
@@ -197,13 +233,28 @@
 			.score {
 				font-size: 1.5rem;
 			}
+
+			.credits-wrap {
+				width: 48px;
+				height: 48px;
+			}
+
+			.credits-count {
+				font-size: 1.2rem;
+			}
 		}
 	</style>
 </head>
 
 <body>
-	<!-- Top Bar: Score -->
+	<!-- Top Bar: Credits (left) + Score (right) -->
 	<div class="top-bar">
+		<div class="credits-wrap">
+			<div class="credits-progress" id="credits-progress"></div>
+			<div class="credits-inner">
+				<span class="credits-count" id="credits-count">0</span>
+			</div>
+		</div>
 		<span class="score">0</span>
 	</div>
 
@@ -304,12 +355,36 @@ Happy birthday	הֶפִּי בֶּרְת'דֵי	יום הולדת שמח
 		let suggestionsRevealed = false;
 		let transliterationRevealed = false;
 
+		const CREDIT_INTERVAL_MS = 60 * 1000;
+		const startTime = Date.now();
+		let creditsSpent = 0;
+
 		// ========== DOM ELEMENTS ==========
 		const scoreEl = document.querySelector('.score');
+		const creditsCountEl = document.getElementById('credits-count');
+		const creditsProgressEl = document.getElementById('credits-progress');
 		const englishWordEl = document.getElementById('english-word');
 		const transliterationEl = document.getElementById('transliteration');
 		const mainAreaEl = document.querySelector('.main-area');
 		const choiceAreaEl = document.getElementById('choice-area');
+
+		// ========== CREDITS ==========
+		function getCreditsEarned() {
+			return Math.floor((Date.now() - startTime) / CREDIT_INTERVAL_MS);
+		}
+
+		function getCredits() {
+			return Math.max(0, getCreditsEarned() - creditsSpent);
+		}
+
+		function getRefillProgress() {
+			return ((Date.now() - startTime) % CREDIT_INTERVAL_MS) / CREDIT_INTERVAL_MS;
+		}
+
+		function updateCreditsUI() {
+			creditsCountEl.textContent = getCredits();
+			creditsProgressEl.style.setProperty('--progress', getRefillProgress());
+		}
 
 		// ========== HELPERS ==========
 		function shuffleArray(arr) {
@@ -395,14 +470,17 @@ Happy birthday	הֶפִּי בֶּרְת'דֵי	יום הולדת שמח
 			if (!suggestionsRevealed) {
 				suggestionsRevealed = true;
 				choiceAreaEl.classList.remove('hidden');
-				// Keep clickable so user can click again to reveal transliteration
-			} else if (!transliterationRevealed && score < 10) {
+			} else if (!transliterationRevealed && getCredits() >= 1) {
+				creditsSpent++;
 				transliterationRevealed = true;
 				transliterationEl.textContent = currentWord.transliteration;
+				updateCreditsUI();
 			}
 		});
 
 		// ========== INIT ==========
+		updateCreditsUI();
+		setInterval(updateCreditsUI, 1000);
 		loadNewRound();
 	</script>
 </body>
