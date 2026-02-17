@@ -200,7 +200,7 @@
 <body>
 	<!-- Top Bar: Score -->
 	<div class="top-bar">
-		<span class="score">$0$</span>
+		<span class="score">0</span>
 	</div>
 
 	<!-- Main Area: English Word -->
@@ -355,14 +355,14 @@ Happy birthday	יום הולדת שמח
 
 			if (chosen === correctHebrew) {
 				score++;
-				scoreEl.textContent = `$${score}$`;
+				scoreEl.textContent = score;
 				btn.classList.add('correct');
 				feedbackEl.textContent = 'Correct!';
 				feedbackEl.classList.add('correct');
 				setTimeout(loadNewRound, 1500);
 			} else {
 				score = Math.max(0, score - 1);
-				scoreEl.textContent = `$${score}$`;
+				scoreEl.textContent = score;
 				btn.classList.add('incorrect');
 				feedbackEl.textContent = 'Try Again!';
 				feedbackEl.classList.add('incorrect');
