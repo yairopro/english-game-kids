@@ -57,7 +57,7 @@
 			font-size: 3.5rem;
 			color: #333;
 			font-weight: 700;
-			letter-spacing: 0.35em;
+			letter-spacing: 0.1em;
 		}
 
 		/* Choice Area - 2x3 Grid */
@@ -109,6 +109,10 @@
 		.choice-btn.hidden {
 			visibility: hidden;
 			pointer-events: none;
+		}
+
+		.choice-area.hidden {
+			display: none;
 		}
 
 		@keyframes greenFlash {
@@ -169,7 +173,7 @@
 		@media (max-width: 500px) {
 			.main-area h2 {
 				font-size: 2.5rem;
-				letter-spacing: 0.25em;
+				letter-spacing: 0.08em;
 			}
 
 			.choice-btn {
@@ -283,6 +287,7 @@ Happy birthday	יום הולדת שמח
 		let currentWord = null;
 		let correctHebrew = null;
 		let awaitingNextRound = false;
+		let suggestionsRevealed = false;
 
 		// ========== DOM ELEMENTS ==========
 		const scoreEl = document.querySelector('.score');
@@ -309,7 +314,8 @@ Happy birthday	יום הולדת שמח
 		// ========== GAME LOOP ==========
 		function loadNewRound() {
 			awaitingNextRound = false;
-			mainAreaEl.classList.remove('clickable');
+			suggestionsRevealed = false;
+			mainAreaEl.classList.add('clickable');
 
 			// Pick random word
 			currentWord = wordPairs[Math.floor(Math.random() * wordPairs.length)];
@@ -322,7 +328,7 @@ Happy birthday	יום הולדת שמח
 			const wrongAnswers = getRandomWords(5, correctHebrew);
 			const allOptions = shuffleArray([...wrongAnswers, correctHebrew]);
 
-			// Build buttons
+			// Build buttons (hidden until user clicks word box)
 			choiceAreaEl.innerHTML = '';
 			allOptions.forEach(hebrew => {
 				const btn = document.createElement('button');
@@ -332,6 +338,7 @@ Happy birthday	יום הולדת שמח
 				btn.addEventListener('click', handleChoice);
 				choiceAreaEl.appendChild(btn);
 			});
+			choiceAreaEl.classList.add('hidden');
 		}
 
 		function handleChoice(e) {
@@ -361,7 +368,15 @@ Happy birthday	יום הולדת שמח
 		}
 
 		mainAreaEl.addEventListener('click', () => {
-			if (awaitingNextRound) loadNewRound();
+			if (awaitingNextRound) {
+				loadNewRound();
+				return;
+			}
+			if (!suggestionsRevealed) {
+				suggestionsRevealed = true;
+				choiceAreaEl.classList.remove('hidden');
+				mainAreaEl.classList.remove('clickable');
+			}
 		});
 
 		// ========== INIT ==========
