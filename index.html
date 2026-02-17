@@ -361,11 +361,7 @@ Happy birthday	יום הולדת שמח
 				btn.classList.add('incorrect');
 				feedbackEl.textContent = 'Try Again!';
 				feedbackEl.classList.add('incorrect');
-				setTimeout(() => {
-					btn.classList.remove('incorrect');
-					feedbackEl.textContent = '';
-					feedbackEl.className = 'feedback-area';
-				}, 800);
+				setTimeout(loadNewRound, 800);
 			}
 		}
 
