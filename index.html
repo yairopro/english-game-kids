@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>English-Hebrew Word Game</title>
+	<style>
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			min-height: 100vh;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+			padding: 20px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		/* Top Bar - Score */
+		.top-bar {
+			width: 100%;
+			max-width: 600px;
+			display: flex;
+			justify-content: flex-end;
+			padding: 15px 0;
+		}
+
+		.score {
+			font-size: 2rem;
+			font-weight: bold;
+			color: #fff;
+			background: rgba(255, 255, 255, 0.2);
+			padding: 10px 25px;
+			border-radius: 50px;
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+		}
+
+		/* Main Area - English Word */
+		.main-area {
+			width: 100%;
+			max-width: 600px;
+			background: rgba(255, 255, 255, 0.95);
+			border-radius: 24px;
+			padding: 50px 30px;
+			margin: 20px 0;
+			text-align: center;
+			box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+		}
+
+		.main-area h2 {
+			font-size: 3.5rem;
+			color: #333;
+			font-weight: 700;
+		}
+
+		/* Choice Area - 2x3 Grid */
+		.choice-area {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			grid-template-rows: repeat(3, 1fr);
+			gap: 15px;
+			width: 100%;
+			max-width: 600px;
+			margin: 20px 0;
+		}
+
+		.choice-btn {
+			font-size: 1.8rem;
+			padding: 25px 15px;
+			border: none;
+			border-radius: 16px;
+			background: #fff;
+			color: #333;
+			cursor: pointer;
+			box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+			transition: transform 0.2s, box-shadow 0.2s;
+			font-weight: 600;
+		}
+
+		.choice-btn:hover {
+			transform: scale(1.03);
+			box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+		}
+
+		.choice-btn:active {
+			transform: scale(0.98);
+		}
+
+		.choice-btn.correct {
+			animation: greenFlash 0.6s ease;
+		}
+
+		.choice-btn.incorrect {
+			animation: redShake 0.6s ease;
+		}
+
+		@keyframes greenFlash {
+
+			0%,
+			100% {
+				background: #fff;
+			}
+
+			50% {
+				background: #4ade80;
+				box-shadow: 0 0 30px #4ade80;
+			}
+		}
+
+		@keyframes redShake {
+
+			0%,
+			100% {
+				transform: translateX(0);
+			}
+
+			20% {
+				transform: translateX(-10px);
+			}
+
+			40% {
+				transform: translateX(10px);
+			}
+
+			60% {
+				transform: translateX(-8px);
+			}
+
+			80% {
+				transform: translateX(8px);
+			}
+		}
+
+		/* Feedback Area */
+		.feedback-area {
+			min-height: 60px;
+			font-size: 2rem;
+			font-weight: bold;
+			text-align: center;
+			margin: 15px 0;
+			color: #fff;
+			text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+		}
+
+		.feedback-area.correct {
+			color: #4ade80;
+			animation: feedbackPop 0.5s ease;
+		}
+
+		.feedback-area.incorrect {
+			color: #f87171;
+			animation: feedbackPop 0.5s ease;
+		}
+
+		@keyframes feedbackPop {
+			0% {
+				transform: scale(0.8);
+				opacity: 0;
+			}
+
+			50% {
+				transform: scale(1.1);
+			}
+
+			100% {
+				transform: scale(1);
+				opacity: 1;
+			}
+		}
+
+		/* Responsive */
+		@media (max-width: 500px) {
+			.main-area h2 {
+				font-size: 2.5rem;
+			}
+
+			.choice-btn {
+				font-size: 1.4rem;
+				padding: 20px 10px;
+			}
+
+			.score {
+				font-size: 1.5rem;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<!-- Top Bar: Score -->
+	<div class="top-bar">
+		<span class="score">$0$</span>
+	</div>
+
+	<!-- Main Area: English Word -->
+	<div class="main-area">
+		<h2 id="english-word">Loading...</h2>
+	</div>
+
+	<!-- Choice Area: 2x3 Grid of Hebrew Buttons -->
+	<div class="choice-area" id="choice-area">
+		<!-- Buttons populated by JS -->
+	</div>
+
+	<!-- Feedback Area -->
+	<div class="feedback-area" id="feedback"></div>
+
+	<script>
+		// ========== DATA: English-Hebrew word pairs ==========
+		const WORDS = `
+Dog	כֶּלֶב
+friend	חָבֵר
+new	חָדָשׁ
+one	1
+two	2
+three	3
+hello	שָׁלוֹם
+Apple	תַּפּוּחַ
+Cake	עוּגָה
+food	אוֹכֶל
+four	4
+Ice cream	גְּלִידָה
+Milk	חָלָב
+sandwich	סֶנְדְוִויץ'
+Pizza	פִּיצָה
+goodbye	לְהִתְרָאוֹת
+ball	כַּדּוּר
+Blue	כָּחוֹל
+Green	יָרוֹק
+Red	אָדוֹם
+White	לָבָן
+Yellow	צָהוֹב
+baby	תִּינוֹק
+brother	אָח
+dad	אַבָּא
+family	מִשְׁפָּחָה
+mom	אִמָּא
+sister	אָחוֹת
+bed	מִיטָה
+chair	כִּסֵּא
+clock	שָׁעוֹן
+five	5
+house	בַּיִת
+table	שֻׁלְחָן
+boy	ילד
+girl	ילדה
+kid	ילד
+learn	ללמוד
+school	בית ספר
+teacher	מורה
+bag	תיק
+big	גדול
+book	ספר
+computer	מחשב
+pen	עט
+desk	שולחן כתיבה
+English	אנגלית
+Math	חשבון
+six	6
+seven	7
+eight	8
+nine	9
+ten	10
+best	הכי טוב
+eat	לאכול
+fun	כיף
+play	לשחק
+sing	לשיר
+talk	לדבר
+Sunday	יום ראשון
+Monday	יום שני
+Tuesday	יום שלישי
+Wednesday	יום רביעי
+Thursday	יום חמישי
+Friday	יום שישי
+Saturday	שבת
+Happy birthday	יום הולדת שמח
+`;
+		const wordPairs = WORDS
+			.trim()
+			.split('\n')
+			.map(line => line.split('\t').map(s => s.trim()))
+			.filter(([e, h]) => e && h)
+			.map(([english, hebrew]) => ({ english, hebrew }));
+
+		// ========== STATE ==========
+		let score = 0;
+		let currentWord = null;
+		let correctHebrew = null;
+
+		// ========== DOM ELEMENTS ==========
+		const scoreEl = document.querySelector('.score');
+		const englishWordEl = document.getElementById('english-word');
+		const choiceAreaEl = document.getElementById('choice-area');
+		const feedbackEl = document.getElementById('feedback');
+
+		// ========== HELPERS ==========
+		function shuffleArray(arr) {
+			const copy = [...arr];
+			for (let i = copy.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[copy[i], copy[j]] = [copy[j], copy[i]];
+			}
+			return copy;
+		}
+
+		function getRandomWords(count, excludeHebrew) {
+			const available = wordPairs.filter(p => p.hebrew !== excludeHebrew);
+			const shuffled = shuffleArray(available);
+			return shuffled.slice(0, count).map(p => p.hebrew);
+		}
+
+		// ========== GAME LOOP ==========
+		function loadNewRound() {
+			feedbackEl.textContent = '';
+			feedbackEl.className = 'feedback-area';
+
+			// Pick random word
+			currentWord = wordPairs[Math.floor(Math.random() * wordPairs.length)];
+			correctHebrew = currentWord.hebrew;
+
+			// Display English word
+			englishWordEl.textContent = currentWord.english;
+
+			// Generate 5 incorrect + 1 correct, shuffle
+			const wrongAnswers = getRandomWords(5, correctHebrew);
+			const allOptions = shuffleArray([...wrongAnswers, correctHebrew]);
+
+			// Build buttons
+			choiceAreaEl.innerHTML = '';
+			allOptions.forEach(hebrew => {
+				const btn = document.createElement('button');
+				btn.className = 'choice-btn';
+				btn.textContent = hebrew;
+				btn.dataset.hebrew = hebrew;
+				btn.addEventListener('click', handleChoice);
+				choiceAreaEl.appendChild(btn);
+			});
+		}
+
+		function handleChoice(e) {
+			const btn = e.target;
+			const chosen = btn.dataset.hebrew;
+
+			if (chosen === correctHebrew) {
+				score++;
+				scoreEl.textContent = `$${score}$`;
+				btn.classList.add('correct');
+				feedbackEl.textContent = 'Correct!';
+				feedbackEl.classList.add('correct');
+				setTimeout(loadNewRound, 800);
+			} else {
+				score = Math.max(0, score - 1);
+				scoreEl.textContent = `$${score}$`;
+				btn.classList.add('incorrect');
+				feedbackEl.textContent = 'Try Again!';
+				feedbackEl.classList.add('incorrect');
+				setTimeout(() => {
+					btn.classList.remove('incorrect');
+					feedbackEl.textContent = '';
+					feedbackEl.className = 'feedback-area';
+				}, 800);
+			}
+		}
+
+		// ========== INIT ==========
+		loadNewRound();
+	</script>
+</body>
+
+</html>
