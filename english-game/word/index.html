@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>English-Hebrew Word Game</title>
+	<style>
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			min-height: 100vh;
+			user-select: none;
+			-webkit-user-select: none;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+			padding: 20px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		/* Top Bar - Credits (left) + Score (right) */
+		.top-bar {
+			width: 100%;
+			max-width: 600px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 15px 0;
+		}
+
+		.credits-wrap {
+			position: relative;
+			width: 56px;
+			height: 56px;
+		}
+
+		.credits-progress {
+			position: absolute;
+			inset: 0;
+			border-radius: 50%;
+			background: conic-gradient(
+				#4ade80 0deg,
+				#4ade80 calc(var(--progress, 0) * 360deg),
+				rgba(255, 255, 255, 0.3) calc(var(--progress, 0) * 360deg)
+			);
+			transition: background 0.3s ease;
+		}
+
+		.credits-inner {
+			position: absolute;
+			inset: 4px;
+			border-radius: 50%;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+		}
+
+		.credits-count {
+			font-size: 1.4rem;
+			font-weight: bold;
+			color: #fff;
+		}
+
+		.score {
+			font-size: 2rem;
+			font-weight: bold;
+			color: #fff;
+			background: rgba(255, 255, 255, 0.2);
+			padding: 10px 25px;
+			border-radius: 50px;
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+		}
+
+		/* Main Area - English Word */
+		.main-area {
+			width: 100%;
+			max-width: 600px;
+			background: rgba(255, 255, 255, 0.95);
+			border-radius: 24px;
+			padding: 50px 30px;
+			margin: 20px 0;
+			text-align: center;
+			box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+		}
+
+		.main-area h2 {
+			font-size: 3.5rem;
+			color: #333;
+			font-weight: 700;
+			letter-spacing: 0.1em;
+		}
+
+		.transliteration {
+			font-size: 1.5rem;
+			color: #666;
+			margin-top: 12px;
+			direction: rtl;
+		}
+
+		/* Choice Area - 2x3 Grid */
+		.choice-area {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			grid-template-rows: repeat(3, 1fr);
+			gap: 15px;
+			width: 100%;
+			max-width: 600px;
+			margin: 20px 0;
+		}
+
+		.choice-btn {
+			font-size: 1.8rem;
+			padding: 25px 15px;
+			border: none;
+			border-radius: 16px;
+			background: #fff;
+			color: #333;
+			cursor: pointer;
+			box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+			transition: transform 0.2s, box-shadow 0.2s;
+			font-weight: 600;
+		}
+
+		.choice-btn:hover {
+			transform: scale(1.03);
+			box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+		}
+
+		.choice-btn:active {
+			transform: scale(0.98);
+		}
+
+		.choice-btn.correct {
+			animation: greenFlash 0.6s ease;
+		}
+
+		.choice-btn.correct-show {
+			background: #4ade80 !important;
+			box-shadow: 0 0 20px rgba(74, 222, 128, 0.6);
+		}
+
+		.choice-btn.incorrect {
+			animation: redShake 0.6s ease;
+		}
+
+		.choice-btn.hidden {
+			visibility: hidden;
+			pointer-events: none;
+		}
+
+		.choice-area.hidden {
+			display: none;
+		}
+
+		@keyframes greenFlash {
+
+			0%,
+			100% {
+				background: #fff;
+			}
+
+			50% {
+				background: #4ade80;
+				box-shadow: 0 0 30px #4ade80;
+			}
+		}
+
+		@keyframes redShake {
+
+			0%,
+			100% {
+				transform: translateX(0);
+			}
+
+			20% {
+				transform: translateX(-10px);
+			}
+
+			40% {
+				transform: translateX(10px);
+			}
+
+			60% {
+				transform: translateX(-8px);
+			}
+
+			80% {
+				transform: translateX(8px);
+			}
+		}
+
+		.main-area {
+			transition: transform 0.2s, box-shadow 0.2s;
+		}
+
+		.main-area.clickable {
+			cursor: pointer;
+		}
+
+		.main-area.clickable:hover {
+			transform: scale(1.02);
+			box-shadow: 0 12px 50px rgba(0, 0, 0, 0.25);
+		}
+
+		.main-area.clickable:active {
+			transform: scale(0.98);
+		}
+
+		/* Responsive */
+		@media (max-width: 500px) {
+			.main-area h2 {
+				font-size: 2.5rem;
+				letter-spacing: 0.08em;
+			}
+
+			.transliteration {
+				font-size: 1.2rem;
+			}
+
+			.choice-btn {
+				font-size: 1.4rem;
+				padding: 20px 10px;
+			}
+
+			.score {
+				font-size: 1.5rem;
+			}
+
+			.credits-wrap {
+				width: 48px;
+				height: 48px;
+			}
+
+			.credits-count {
+				font-size: 1.2rem;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<!-- Top Bar: Credits (left) + Score (right) -->
+	<div class="top-bar">
+		<div class="credits-wrap">
+			<div class="credits-progress" id="credits-progress"></div>
+			<div class="credits-inner">
+				<span class="credits-count" id="credits-count">0</span>
+			</div>
+		</div>
+		<span class="score">0</span>
+	</div>
+
+	<!-- Main Area: English Word -->
+	<div class="main-area">
+		<h2 id="english-word">Loading...</h2>
+		<p id="transliteration" class="transliteration"></p>
+	</div>
+
+	<!-- Choice Area: 2x3 Grid of Hebrew Buttons -->
+	<div class="choice-area" id="choice-area">
+		<!-- Buttons populated by JS -->
+	</div>
+
+	<script>
+		// ========== DATA: English-Hebrew word pairs ==========
+		const WORDS = `
+Dog	דּוֹג	כֶּלֶב
+Friend	פְרֶנְד	חָבֵר
+New	נְיוּ	חָדָשׁ
+One	וַואן	1
+Two	טוּ	2
+Three	תְ'רִי	3
+Hello	הֶלוֹ	שָׁלוֹם
+Apple	אֶפֶּל	תַּפּוּחַ
+Cake	קֵייק	עוּגָה
+Food	פוּד	אוֹכֶל
+Four	פוֹר	4
+Ice cream	אָיְיס קְרִים	גְּלִידָה
+Milk	מִילְק	חָלָב
+Sandwich	סֶנְדְוִויץ'	סֶנְדְוִויץ'
+Pizza	פִּיצָה	פִּיצָה
+Goodbye	גוּדְבַּאי	לְהִתְרָאוֹת
+Ball	בּוֹל	כַּדּוּר
+Blue	בְּלוּ	כָּחוֹל
+Green	גְרִין	יָרוֹק
+Red	רֶד	אָדוֹם
+White	וַואיְט	לָבָן
+Yellow	יֶלוֹ	צָהוֹב
+Baby	בֵּייבִּי	תִּינוֹק
+Brother	בְּרַאדֶ'ר	אָח
+Dad	דֶאד	אַבָּא
+Family	פֶמִילִי	מִשְׁפָּחָה
+Mom	מַאם	אִמָּא
+Sister	סִיסְטֶר	אָחוֹת
+Bed	בֶּד	מִיטָה
+Chair	צֶ'ר	כִּסֵּא
+Clock	קְלוֹק	שָׁעוֹן
+Five	פַאיְב	5
+House	הַאוּס	בַּיִת
+Table	טֵייבֶּל	שֻׁלְחָן
+Boy	בּוֹי	ילד
+Girl	גֶרְל	ילדה
+Kid	קִיד	ילד
+Learn	לֶרְן	ללמוד
+School	סְקוּל	בית ספר
+Teacher	טִיצֶ'ר	מורה
+Bag	בֶּג	תיק
+Big	בִּיג	גדול
+Book	בּוּק	ספר
+Computer	קַמְפְּיוּטֶר	מחשב
+Pen	פֶּן	עט
+Desk	דֶסְק	שולחן כתיבה
+English	אִינְגְלִישׁ	אנגלית
+Math	מֶת'	חשבון
+Six	סִיקְס	6
+Seven	סֶבֶן	7
+Eight	אֵייט	8
+Nine	נַאיְן	9
+Ten	טֶן	10
+Best	בֶּסְט	הכי טוב
+Eat	אִיט	לאכול
+Fun	פַאן	כיף
+Play	פְּלֵיי	לשחק
+Sing	סִינְג	לשיר
+Talk	טוֹק	לדבר
+Sunday	סַנְדֵי	יום ראשון
+Monday	מַנְדֵי	יום שני
+Tuesday	טְיוּזְדֵי	יום שלישי
+Wednesday	וֶנְזְדֵי	יום רביעי
+Thursday	תְ'רְזְדֵי	יום חמישי
+Friday	פְרַאיְדֵי	יום שישי
+Saturday	סַאטֶרְדֵי	שבת
+Happy birthday	הֶפִּי בֶּרְת'דֵי	יום הולדת שמח
+`;
+		const wordPairs = WORDS
+			.trim()
+			.split('\n')
+			.map(line => line.split('\t').map(s => s.trim()))
+			.filter(parts => parts[0] && parts[2])
+			.map(([english, transliteration, hebrew]) => ({ english: english.toUpperCase(), transliteration, hebrew }));
+
+		// Word scores: higher = more likely to appear. 0 = mastered (no longer shown)
+		const INITIAL_SCORE = 10;
+		const wordScores = {};
+		wordPairs.forEach(p => { wordScores[p.english] = INITIAL_SCORE; });
+
+		// ========== STATE ==========
+		let score = 0;
+		let currentWord = null;
+		let correctHebrew = null;
+		let awaitingNextRound = false;
+		let awaitingAfterCorrect = false;
+		let suggestionsRevealed = false;
+		let transliterationRevealed = false;
+
+		let roundsCompleted = 0;
+		let creditsSpent = 0;
+
+		// ========== DOM ELEMENTS ==========
+		const scoreEl = document.querySelector('.score');
+		const creditsCountEl = document.getElementById('credits-count');
+		const creditsProgressEl = document.getElementById('credits-progress');
+		const englishWordEl = document.getElementById('english-word');
+		const transliterationEl = document.getElementById('transliteration');
+		const mainAreaEl = document.querySelector('.main-area');
+		const choiceAreaEl = document.getElementById('choice-area');
+
+		// ========== CREDITS ==========
+		function getCreditsEarned() {
+			return Math.floor(roundsCompleted / 10);
+		}
+
+		function getCredits() {
+			return Math.max(0, getCreditsEarned() - creditsSpent);
+		}
+
+		function getRefillProgress() {
+			return (roundsCompleted % 10) / 10;
+		}
+
+		function updateCreditsUI() {
+			creditsCountEl.textContent = getCredits();
+			creditsProgressEl.style.setProperty('--progress', getRefillProgress());
+		}
+
+		// ========== HELPERS ==========
+		function shuffleArray(arr) {
+			const copy = [...arr];
+			for (let i = copy.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[copy[i], copy[j]] = [copy[j], copy[i]];
+			}
+			return copy;
+		}
+
+		function getRandomWords(count, excludeHebrew) {
+			const available = wordPairs.filter(p => p.hebrew !== excludeHebrew);
+			const shuffled = shuffleArray(available);
+			return shuffled.slice(0, count).map(p => p.hebrew);
+		}
+
+		function getAvailableWords() {
+			return wordPairs.filter(p => wordScores[p.english] > 0);
+		}
+
+		function pickWordByWeight() {
+			const available = getAvailableWords();
+			if (available.length === 0) return null;
+			const total = available.reduce((sum, p) => sum + wordScores[p.english], 0);
+			let r = Math.random() * total;
+			for (const p of available) {
+				r -= wordScores[p.english];
+				if (r <= 0) return p;
+			}
+			return available[available.length - 1];
+		}
+
+		// ========== GAME LOOP ==========
+		function showGameOver() {
+			mainAreaEl.classList.remove('clickable');
+			englishWordEl.textContent = 'Game Over';
+			transliterationEl.textContent = 'You mastered all the words!';
+			choiceAreaEl.classList.add('hidden');
+		}
+
+		function loadNewRound() {
+			if (currentWord !== null) {
+				roundsCompleted++;
+				updateCreditsUI();
+			}
+			awaitingNextRound = false;
+			awaitingAfterCorrect = false;
+			suggestionsRevealed = false;
+			transliterationRevealed = false;
+			mainAreaEl.classList.add('clickable');
+
+			// Pick word by score (higher score = more likely)
+			currentWord = pickWordByWeight();
+			if (!currentWord) {
+				showGameOver();
+				return;
+			}
+			correctHebrew = currentWord.hebrew;
+
+			// Display English word only (transliteration shown on click after suggestions)
+			englishWordEl.textContent = currentWord.english;
+			transliterationEl.textContent = '';
+
+			// Generate 5 incorrect + 1 correct, shuffle
+			const wrongAnswers = getRandomWords(5, correctHebrew);
+			const allOptions = shuffleArray([...wrongAnswers, correctHebrew]);
+
+			// Build buttons (hidden until user clicks word box)
+			choiceAreaEl.innerHTML = '';
+			allOptions.forEach(hebrew => {
+				const btn = document.createElement('button');
+				btn.className = 'choice-btn';
+				btn.textContent = hebrew;
+				btn.dataset.hebrew = hebrew;
+				btn.addEventListener('click', handleChoice);
+				choiceAreaEl.appendChild(btn);
+			});
+			choiceAreaEl.classList.add('hidden');
+		}
+
+		function handleChoice(e) {
+			if (awaitingNextRound) return;
+			const btn = e.target;
+			const chosen = btn.dataset.hebrew;
+
+			if (chosen === correctHebrew) {
+				score += transliterationRevealed ? 1 : 2;
+				wordScores[currentWord.english] = Math.max(0, wordScores[currentWord.english] - 1);
+				scoreEl.textContent = score;
+				btn.classList.add('correct', 'correct-show');
+				awaitingNextRound = true;
+				awaitingAfterCorrect = true;
+				setTimeout(loadNewRound, 1500);
+			} else {
+				score = Math.max(0, score - 1);
+				wordScores[currentWord.english] = (wordScores[currentWord.english] || INITIAL_SCORE) + 1;
+				scoreEl.textContent = score;
+				btn.classList.add('incorrect');
+				transliterationEl.textContent = currentWord.transliteration;
+				transliterationRevealed = true;
+				// Highlight the correct answer in green
+				const correctBtn = choiceAreaEl.querySelector(`[data-hebrew="${correctHebrew}"]`);
+				if (correctBtn) correctBtn.classList.add('correct-show');
+				// Hide wrong answers (keep place, not clickable)
+				[...choiceAreaEl.querySelectorAll('.choice-btn')].forEach(b => {
+					if (b.dataset.hebrew !== correctHebrew) b.classList.add('hidden');
+				});
+				awaitingNextRound = true;
+				mainAreaEl.classList.add('clickable');
+			}
+		}
+
+		mainAreaEl.addEventListener('click', () => {
+			if (awaitingNextRound) {
+				if (awaitingAfterCorrect) return;
+				loadNewRound();
+				return;
+			}
+			if (!suggestionsRevealed) {
+				suggestionsRevealed = true;
+				choiceAreaEl.classList.remove('hidden');
+			} else if (!transliterationRevealed && getCredits() >= 1) {
+				creditsSpent++;
+				transliterationRevealed = true;
+				transliterationEl.textContent = currentWord.transliteration;
+				updateCreditsUI();
+			}
+		});
+
+		// ========== INIT ==========
+		updateCreditsUI();
+		loadNewRound();
+	</script>
+</body>
+
+</html>

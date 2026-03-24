@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Smart Letter Learner A-Z</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+	<link
+		href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Heebo:wght@400;700&family=Lora:wght@500;700&display=swap"
+		rel="stylesheet">
+	<style>
+		body {
+			font-family: 'Fredoka One', cursive;
+			background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+			touch-action: manipulation;
+			overflow-x: hidden;
+		}
+
+		/* Serif font for English letters to help with recognition */
+		.serif-font {
+			font-family: 'Lora', serif;
+		}
+
+		.hebrew-text {
+			font-family: 'Heebo', sans-serif;
+			direction: rtl;
+		}
+
+		.card {
+			transition: transform 0.2s, box-shadow 0.2s;
+		}
+
+		.card:active {
+			transform: scale(0.95);
+		}
+
+		.correct-anim {
+			animation: bounce 0.5s ease;
+			background-color: #4ade80 !important;
+			color: white !important;
+		}
+
+		.wrong-anim {
+			animation: shake 0.5s ease;
+			background-color: #f87171 !important;
+			color: white !important;
+		}
+
+		@keyframes bounce {
+
+			0%,
+			100% {
+				transform: translateY(0);
+			}
+
+			50% {
+				transform: translateY(-20px);
+			}
+		}
+
+		@keyframes shake {
+
+			0%,
+			100% {
+				transform: translateX(0);
+			}
+
+			25% {
+				transform: translateX(-10px);
+			}
+
+			75% {
+				transform: translateX(10px);
+			}
+		}
+
+		.celebrate-text {
+			animation: pulse 1s infinite;
+		}
+
+		@keyframes pulse {
+
+			0%,
+			100% {
+				transform: scale(1);
+			}
+
+			50% {
+				transform: scale(1.1);
+			}
+		}
+
+		.no-scrollbar::-webkit-scrollbar {
+			display: none;
+		}
+
+		.no-scrollbar {
+			-ms-overflow-style: none;
+			scrollbar-width: none;
+		}
+	</style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+	<!-- Settings Modal -->
+	<div id="settings-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+		<div class="bg-white rounded-3xl w-full max-w-lg max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+			<div class="p-6 border-b flex justify-between items-center bg-indigo-50">
+				<h2 class="text-xl text-indigo-700">Choose Letters</h2>
+				<button onclick="toggleModal()"
+					class="text-gray-500 hover:text-red-500 text-3xl font-sans">&times;</button>
+			</div>
+			<div class="p-4 overflow-y-auto grid grid-cols-3 sm:grid-cols-4 gap-2 no-scrollbar"
+				id="letter-selector-grid">
+				<!-- Selection buttons injected here -->
+			</div>
+			<div class="p-6 border-t flex gap-2">
+				<button onclick="selectAll(true)" class="flex-1 bg-gray-200 py-2 rounded-xl text-sm">Select All</button>
+				<button onclick="selectAll(false)" class="flex-1 bg-gray-200 py-2 rounded-xl text-sm">Clear All</button>
+				<button onclick="saveAndClose()"
+					class="flex-1 bg-indigo-600 text-white py-2 rounded-xl font-bold">Start!</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Main Game UI -->
+	<div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-6 border-4 border-indigo-400 relative z-10">
+		<div class="flex justify-between items-center mb-6">
+			<button onclick="toggleModal()"
+				class="bg-indigo-100 text-indigo-600 p-2 rounded-xl hover:bg-indigo-200 transition-colors">
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+					stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+						d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+						d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+				</svg>
+			</button>
+			<div id="score-container"
+				class="bg-yellow-400 text-white px-5 py-2 rounded-full shadow-md text-lg min-w-[110px] text-center transition-all duration-500">
+				Score: <span id="score">0</span>
+			</div>
+		</div>
+
+		<div id="mode-text"
+			class="text-center text-gray-400 text-sm mb-2 uppercase tracking-widest font-sans font-bold">
+			Loading...
+		</div>
+
+		<div class="text-center mb-8">
+			<div id="target-display"
+				class="text-8xl text-indigo-600 drop-shadow-lg min-h-[140px] flex items-center justify-center"></div>
+		</div>
+
+		<div id="options-container" class="grid grid-cols-2 gap-3"></div>
+
+		<div id="feedback" class="mt-6 text-center text-xl h-6 opacity-0 transition-opacity duration-300 font-bold">
+			Great Job! 🌟
+		</div>
+	</div>
+
+	<script>
+		const allLetters = [
+			{ id: 0, char: 'Aa', hebrew: 'אֵי', weight: 10, active: true },
+			{ id: 1, char: 'Bb', hebrew: 'בִּי', weight: 10, active: true },
+			{ id: 2, char: 'Cc', hebrew: 'סִי', weight: 10, active: true },
+			{ id: 3, char: 'Dd', hebrew: 'דִּי', weight: 10, active: true },
+			{ id: 4, char: 'Ee', hebrew: 'אִי', weight: 10, active: true },
+			{ id: 5, char: 'Ff', hebrew: 'אֶף', weight: 10, active: true },
+			{ id: 6, char: 'Gg', hebrew: 'גִּי׳', weight: 10, active: true },
+			{ id: 7, char: 'Hh', hebrew: 'אֵיְיטְשׁ', weight: 10, active: true },
+			{ id: 8, char: 'Ii', hebrew: 'אָי', weight: 10, active: true },
+			{ id: 9, char: 'Jj', hebrew: 'גֵיי׳', weight: 10, active: true },
+			{ id: 10, char: 'Kk', hebrew: 'כֵּי', weight: 10, active: true },
+			{ id: 11, char: 'Ll', hebrew: 'אֶל', weight: 10, active: false },
+			{ id: 12, char: 'Mm', hebrew: 'אֶם', weight: 10, active: false },
+			{ id: 13, char: 'Nn', hebrew: 'אֶן', weight: 10, active: false },
+			{ id: 14, char: 'Oo', hebrew: 'אוֹ', weight: 10, active: false },
+			{ id: 15, char: 'Pp', hebrew: 'פִּי', weight: 10, active: false },
+			{ id: 16, char: 'Qq', hebrew: 'קְיוּ', weight: 10, active: false },
+			{ id: 17, char: 'Rr', hebrew: 'אָר', weight: 10, active: false },
+			{ id: 18, char: 'Ss', hebrew: 'אֶס', weight: 10, active: false },
+			{ id: 19, char: 'Tt', hebrew: 'טִי', weight: 10, active: false },
+			{ id: 20, char: 'Uu', hebrew: 'יוּ', weight: 10, active: false },
+			{ id: 21, char: 'Vv', hebrew: 'וִוי', weight: 10, active: false },
+			{ id: 22, char: 'Ww', hebrew: 'דַּאבֶּלְיוּ', weight: 10, active: false },
+			{ id: 23, char: 'Xx', hebrew: 'אֶקְס', weight: 10, active: false },
+			{ id: 24, char: 'Yy', hebrew: 'אוּאָי', weight: 10, active: false },
+			{ id: 25, char: 'Zz', hebrew: 'זִי', weight: 10, active: false }
+		];
+
+		let score = 0;
+		let currentLetter = null;
+		let isProcessing = false;
+		let gameMode = 'L_TO_H';
+		let hasCelebrated = false;
+
+		const scoreEl = document.getElementById('score');
+		const scoreContainer = document.getElementById('score-container');
+		const targetEl = document.getElementById('target-display');
+		const optionsEl = document.getElementById('options-container');
+		const feedbackEl = document.getElementById('feedback');
+		const modeTextEl = document.getElementById('mode-text');
+		const modal = document.getElementById('settings-modal');
+		const selectorGrid = document.getElementById('letter-selector-grid');
+
+		function setupSelector() {
+			selectorGrid.innerHTML = '';
+			allLetters.forEach(l => {
+				const btn = document.createElement('button');
+				btn.className = `p-3 rounded-2xl border-2 transition-all flex flex-col items-center ${l.active ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-400'}`;
+				btn.innerHTML = `<span class="text-lg font-bold serif-font">${l.char}</span><span class="text-xs hebrew-text">${l.hebrew}</span>`;
+				btn.onclick = () => {
+					l.active = !l.active;
+					btn.className = `p-3 rounded-2xl border-2 transition-all flex flex-col items-center ${l.active ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-400'}`;
+				};
+				selectorGrid.appendChild(btn);
+			});
+		}
+
+		function selectAll(val) {
+			allLetters.forEach(l => l.active = val);
+			setupSelector();
+		}
+
+		function toggleModal() {
+			modal.classList.toggle('hidden');
+			modal.classList.toggle('flex');
+			if (!modal.classList.contains('hidden')) setupSelector();
+		}
+
+		function saveAndClose() {
+			const activeCount = allLetters.filter(l => l.active).length;
+			if (activeCount < 2) return;
+			toggleModal();
+			initGame();
+		}
+
+		function weightedRandomSelect() {
+			const activePool = allLetters.filter(l => l.active);
+			const totalWeight = activePool.reduce((sum, item) => sum + item.weight, 0);
+			let random = Math.random() * totalWeight;
+
+			for (const item of activePool) {
+				if (random < item.weight) return item;
+				random -= item.weight;
+			}
+			return activePool[0];
+		}
+
+		function triggerConfetti() {
+			const duration = 5 * 1000;
+			const animationEnd = Date.now() + duration;
+			const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+
+			const interval = setInterval(function () {
+				const timeLeft = animationEnd - Date.now();
+				if (timeLeft <= 0) return clearInterval(interval);
+				const particleCount = 50 * (timeLeft / duration);
+				confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random() * 0.4, y: Math.random() - 0.2 } }));
+				confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random() * 0.4 + 0.6, y: Math.random() - 0.2 } }));
+			}, 250);
+
+			scoreContainer.classList.add('celebrate-text', 'bg-pink-500', 'scale-110');
+		}
+
+		function initGame() {
+			if (isProcessing) return;
+			const activePool = allLetters.filter(l => l.active);
+
+			gameMode = Math.random() > 0.5 ? 'L_TO_H' : 'H_TO_L';
+			currentLetter = weightedRandomSelect();
+
+			if (gameMode === 'L_TO_H') {
+				modeTextEl.textContent = "Which sound matches?";
+				targetEl.textContent = currentLetter.char;
+				targetEl.classList.remove('hebrew-text');
+				targetEl.classList.add('serif-font');
+			} else {
+				modeTextEl.textContent = "Which letter is this?";
+				targetEl.textContent = currentLetter.hebrew;
+				targetEl.classList.add('hebrew-text');
+				targetEl.classList.remove('serif-font');
+			}
+
+			const len = targetEl.textContent.length;
+			targetEl.style.fontSize = len > 8 ? "3rem" : (len > 4 ? "4.5rem" : "7.5rem");
+
+			let pool = activePool.filter(l => l.id !== currentLetter.id);
+			let distractors = [];
+			const count = Math.min(pool.length, 5);
+			for (let i = 0; i < count; i++) {
+				const randIndex = Math.floor(Math.random() * pool.length);
+				distractors.push(pool.splice(randIndex, 1)[0]);
+			}
+
+			const choices = [currentLetter, ...distractors].sort(() => Math.random() - 0.5);
+
+			optionsEl.innerHTML = '';
+			choices.forEach(choice => {
+				const btn = document.createElement('button');
+				btn.className = "card bg-blue-50 hover:bg-blue-100 border-2 border-blue-200 rounded-2xl py-3 px-1 font-bold text-blue-800 shadow-sm flex justify-center items-center min-h-[70px]";
+
+				if (gameMode === 'L_TO_H') {
+					btn.textContent = choice.hebrew;
+					btn.classList.add('hebrew-text');
+					btn.classList.add(choice.hebrew.length > 5 ? 'text-lg' : 'text-2xl');
+				} else {
+					btn.textContent = choice.char;
+					btn.classList.add('serif-font', 'text-3xl');
+				}
+
+				btn.onclick = () => handleGuess(choice, btn);
+				optionsEl.appendChild(btn);
+			});
+
+			feedbackEl.classList.add('opacity-0');
+		}
+
+		function handleGuess(choice, element) {
+			if (isProcessing) return;
+			isProcessing = true;
+
+
+			const isCorrect = choice.id === currentLetter.id;
+
+			if (isCorrect) {
+				score += 1;
+				currentLetter.weight = Math.max(2, currentLetter.weight - 3);
+				element.classList.add('correct-anim');
+				showFeedback("Correct! 🎉", "text-green-500");
+
+				if (score >= 50 && !hasCelebrated) {
+					hasCelebrated = true;
+					triggerConfetti();
+				}
+
+				setTimeout(() => {
+					isProcessing = false;
+					initGame();
+				}, 800);
+			} else {
+				// Incorrect guess: Penalty increased to 10 points
+				score -= 10;
+				currentLetter.weight += 10;
+				element.classList.add('wrong-anim');
+				showFeedback("-10 Points! 🔄", "text-red-500");
+
+				setTimeout(() => {
+					element.classList.remove('wrong-anim');
+					isProcessing = false;
+				}, 800);
+			}
+
+			scoreEl.textContent = score;
+		}
+
+		function showFeedback(msg, colorClass) {
+			feedbackEl.textContent = msg;
+			feedbackEl.className = `mt-6 text-center text-xl opacity-100 transition-opacity font-bold ${colorClass}`;
+		}
+
+		window.onload = initGame;
+	</script>
+</body>
+
+</html>
