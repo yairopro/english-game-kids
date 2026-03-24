@@ -141,7 +141,7 @@
 			</button>
 			<div id="score-container"
 				class="bg-yellow-400 text-white px-5 py-2 rounded-full shadow-md text-lg min-w-[110px] text-center transition-all duration-500">
-				Score: <span id="score">0</span>
+				<span id="score">0</span>
 			</div>
 		</div>
 
@@ -164,32 +164,32 @@
 
 	<script>
 		const allLetters = [
-			{ id: 0, char: 'Aa', hebrew: 'אֵי', weight: 10, active: true },
-			{ id: 1, char: 'Bb', hebrew: 'בִּי', weight: 10, active: true },
-			{ id: 2, char: 'Cc', hebrew: 'סִי', weight: 10, active: true },
-			{ id: 3, char: 'Dd', hebrew: 'דִּי', weight: 10, active: true },
-			{ id: 4, char: 'Ee', hebrew: 'אִי', weight: 10, active: true },
-			{ id: 5, char: 'Ff', hebrew: 'אֶף', weight: 10, active: true },
-			{ id: 6, char: 'Gg', hebrew: 'גִּי׳', weight: 10, active: true },
-			{ id: 7, char: 'Hh', hebrew: 'אֵיְשׁ', weight: 10, active: true },
-			{ id: 8, char: 'Ii', hebrew: 'אָי', weight: 10, active: true },
-			{ id: 9, char: 'Jj', hebrew: 'גֵיי׳', weight: 10, active: true },
-			{ id: 10, char: 'Kk', hebrew: 'כֵּי', weight: 10, active: true },
-			{ id: 11, char: 'Ll', hebrew: 'אֶל', weight: 10, active: false },
-			{ id: 12, char: 'Mm', hebrew: 'אֶם', weight: 10, active: false },
-			{ id: 13, char: 'Nn', hebrew: 'אֶן', weight: 10, active: false },
-			{ id: 14, char: 'Oo', hebrew: 'אוֹ', weight: 10, active: false },
-			{ id: 15, char: 'Pp', hebrew: 'פִּי', weight: 10, active: false },
-			{ id: 16, char: 'Qq', hebrew: 'קְיוּ', weight: 10, active: false },
-			{ id: 17, char: 'Rr', hebrew: 'אָר', weight: 10, active: false },
-			{ id: 18, char: 'Ss', hebrew: 'אֶס', weight: 10, active: false },
-			{ id: 19, char: 'Tt', hebrew: 'טִי', weight: 10, active: false },
-			{ id: 20, char: 'Uu', hebrew: 'יוּ', weight: 10, active: false },
-			{ id: 21, char: 'Vv', hebrew: 'וִוי', weight: 10, active: false },
-			{ id: 22, char: 'Ww', hebrew: 'דַּאבֶּלְיוּ', weight: 10, active: false },
-			{ id: 23, char: 'Xx', hebrew: 'אֶקְס', weight: 10, active: false },
-			{ id: 24, char: 'Yy', hebrew: 'אוּאָי', weight: 10, active: false },
-			{ id: 25, char: 'Zz', hebrew: 'זִי', weight: 10, active: false }
+			{ id: 0, char: 'A a', hebrew: 'אֵי', weight: 10, active: true },
+			{ id: 1, char: 'B b', hebrew: 'בִּי', weight: 10, active: true },
+			{ id: 2, char: 'C c', hebrew: 'סִי', weight: 10, active: true },
+			{ id: 3, char: 'D d', hebrew: 'דִּי', weight: 10, active: true },
+			{ id: 4, char: 'E e', hebrew: 'אִי', weight: 10, active: true },
+			{ id: 5, char: 'F f', hebrew: 'אֶף', weight: 10, active: true },
+			{ id: 6, char: 'G g', hebrew: 'גִ׳', weight: 10, active: true },
+			{ id: 7, char: 'H h', hebrew: 'אֵישׁ', weight: 10, active: true },
+			{ id: 8, char: 'I i', hebrew: 'אָי', weight: 10, active: true },
+			{ id: 9, char: 'J j', hebrew: 'גֵ׳י', weight: 10, active: true },
+			{ id: 10, char: 'K k', hebrew: 'כֵּי', weight: 10, active: true },
+			{ id: 11, char: 'L l', hebrew: 'אֶל', weight: 10, active: false },
+			{ id: 12, char: 'M m', hebrew: 'אֶם', weight: 10, active: false },
+			{ id: 13, char: 'N n', hebrew: 'אֶן', weight: 10, active: false },
+			{ id: 14, char: 'O o', hebrew: 'אוֹ', weight: 10, active: false },
+			{ id: 15, char: 'P p', hebrew: 'פִּי', weight: 10, active: false },
+			{ id: 16, char: 'Q q', hebrew: 'קְיוּ', weight: 10, active: false },
+			{ id: 17, char: 'R r', hebrew: 'אָר', weight: 10, active: false },
+			{ id: 18, char: 'S s', hebrew: 'אֶס', weight: 10, active: false },
+			{ id: 19, char: 'T t', hebrew: 'טִי', weight: 10, active: false },
+			{ id: 20, char: 'U u', hebrew: 'יוּ', weight: 10, active: false },
+			{ id: 21, char: 'V v', hebrew: 'וִוי', weight: 10, active: false },
+			{ id: 22, char: 'W w', hebrew: 'דַּאבֶּלְיוּ', weight: 10, active: false },
+			{ id: 23, char: 'X x', hebrew: 'אֶקְס', weight: 10, active: false },
+			{ id: 24, char: 'Y y', hebrew: 'אוּאָי', weight: 10, active: false },
+			{ id: 25, char: 'Z z', hebrew: 'זִי', weight: 10, active: false }
 		];
 
 		let score = 0;
@@ -212,7 +212,7 @@
 			allLetters.forEach(l => {
 				const btn = document.createElement('button');
 				btn.className = `p-3 rounded-2xl border-2 transition-all flex flex-col items-center ${l.active ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-400'}`;
-				btn.innerHTML = `<span class="text-lg font-bold serif-font">${l.char}</span><span class="text-xs hebrew-text">${l.hebrew}</span>`;
+				btn.innerHTML = `<span class="text-lg font-bold serif-font">${l.char}</span>`;
 				btn.onclick = () => {
 					l.active = !l.active;
 					btn.className = `p-3 rounded-2xl border-2 transition-all flex flex-col items-center ${l.active ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-400'}`;
@@ -347,6 +347,17 @@
 				score -= 10;
 				currentLetter.weight += 10;
 				element.classList.add('wrong-anim');
+
+				// Show both letter and transliteration on the wrongly guessed button
+				const letterText = choice.char;
+				const hebrewText = choice.hebrew;
+				element.innerHTML = `
+					<div class="flex flex-col items-center justify-center -my-1">
+						<span class="serif-font ${letterText.length > 5 ? 'text-xl' : 'text-2xl'}">${letterText}</span>
+						<span class="hebrew-text ${hebrewText.length > 5 ? 'text-md' : 'text-lg'}">${hebrewText}</span>
+					</div>`;
+				element.classList.remove('text-3xl', 'text-2xl', 'text-lg', 'serif-font', 'hebrew-text');
+
 				showFeedback("-10 Points! 🔄", "text-red-500");
 
 				setTimeout(() => {
